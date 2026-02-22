@@ -7,7 +7,7 @@ export const STORAGE_PATHS = {
   RENDERS: "roomify/renders",
 } as const;
 
-export const ACCEPTED_TYPES = ["image/jpg", "image/jpeg", "image/png"];
+export const ACCEPTED_TYPES = ["image/jpeg", "image/png"];
 
 // Timing Constants (in milliseconds)
 export const SHARE_STATUS_RESET_DELAY_MS = 1500;

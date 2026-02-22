@@ -51,6 +51,9 @@ export default function Upload({ onComplete }: UploadProps) {
       const base64 = e.target?.result as string;
 
       let currentProgress = 0;
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current);
+      }
       progressIntervalRef.current = setInterval(() => {
         currentProgress += PROGRESS_INCREMENT;
         if (currentProgress >= 100) {
