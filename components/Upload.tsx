@@ -1,11 +1,12 @@
 import { Check, ImageIcon, UploadIcon } from "lucide-react";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useOutletContext } from "react-router";
 import {
+  ACCEPTED_TYPES,
   PROGRESS_INCREMENT,
   PROGRESS_INTERVAL_MS,
   REDIRECT_DELAY_MS,
-} from "../lib/constanst";
+} from "../lib/constants";
 
 interface UploadProps {
   onComplete: (base64: string) => void;
@@ -15,25 +16,49 @@ export default function Upload({ onComplete }: UploadProps) {
   const [file, setFile] = useState<File | null>(null);
   const [progress, setProgress] = useState<number>(0);
   const [isDragging, setIsDragging] = useState(false);
+  const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const fileReaderRef = useRef<FileReader | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current);
+      }
+      if (fileReaderRef.current) {
+        fileReaderRef.current.abort();
+      }
+    };
+  }, []);
 
   const { isSignedIn } = useOutletContext<AuthContext>();
 
   const processFile = (selectedFile: File) => {
     if (!isSignedIn) return;
+    if (!ACCEPTED_TYPES.includes(selectedFile.type)) return;
 
     setFile(selectedFile);
     setProgress(0);
 
     const reader = new FileReader();
+
+    reader.onerror = () => {
+      setFile(null);
+      setProgress(0);
+    };
+
+    fileReaderRef.current = reader;
     reader.onload = (e) => {
       const base64 = e.target?.result as string;
 
       let currentProgress = 0;
-      const interval = setInterval(() => {
+      progressIntervalRef.current = setInterval(() => {
         currentProgress += PROGRESS_INCREMENT;
         if (currentProgress >= 100) {
           currentProgress = 100;
-          clearInterval(interval);
+          if (progressIntervalRef.current) {
+            clearInterval(progressIntervalRef.current);
+            progressIntervalRef.current = null;
+          }
           setTimeout(() => {
             onComplete(base64);
           }, REDIRECT_DELAY_MS);
