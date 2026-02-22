@@ -5,6 +5,11 @@ import { Button } from "components/ui/Button";
 import Upload from "components/Upload";
 import { useNavigate } from "react-router";
 
+/**
+ * Provide the route metadata for this route.
+ *
+ * @returns An array of meta entries for the document head: a title entry and a description meta entry
+ */
 export function meta({}: Route.MetaArgs) {
   return [
     { title: "New React Router App" },
@@ -12,6 +17,11 @@ export function meta({}: Route.MetaArgs) {
   ];
 }
 
+/**
+ * Renders the Home route: the app's landing page with hero content, an upload area, and a projects section.
+ *
+ * @returns The React element for the Home page containing the hero, upload card, and projects list.
+ */
 export default function Home() {
   const navigate = useNavigate();
 
